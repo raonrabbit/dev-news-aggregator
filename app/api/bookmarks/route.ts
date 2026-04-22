@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase-server';
-import { addBookmark, removeBookmark, getBookmarksForUser, PAGE_SIZE } from '@/lib/db';
+import { addBookmark, removeBookmark, getBookmarksForUser, getBookmarkIdsForUser, PAGE_SIZE } from '@/lib/db';
 
 export async function GET(req: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+
+  if (req.nextUrl.searchParams.get('ids') === 'true') {
+    if (!user) return NextResponse.json({ ids: [] });
+    const ids = await getBookmarkIdsForUser(user.id);
+    return NextResponse.json({ ids });
+  }
 
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import type { Article } from '@/lib/db';
 import BookmarkButton from './BookmarkButton';
 
@@ -11,6 +12,14 @@ interface Props {
 }
 
 export default function ArticleList({ articles, page, pageSize }: Props) {
+  const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    fetch('/api/bookmarks?ids=true')
+      .then((res) => (res.ok ? (res.json() as Promise<{ ids: string[] }>) : { ids: [] }))
+      .then(({ ids }) => setBookmarkedIds(new Set(ids)))
+      .catch(() => {});
+  }, []);
   if (articles.length === 0 && page === 0) {
     return (
       <p className="text-center py-16 text-zinc-500">
@@ -37,7 +46,7 @@ export default function ArticleList({ articles, page, pageSize }: Props) {
               {article.published_at && (
                 <span>{new Date(article.published_at).toLocaleDateString('ko-KR')}</span>
               )}
-              <BookmarkButton articleId={article.id} />
+              <BookmarkButton articleId={article.id} initialBookmarked={bookmarkedIds.has(article.id)} />
             </div>
           </li>
         ))}

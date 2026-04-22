@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface Props {
   articleId: string;
@@ -10,6 +10,10 @@ interface Props {
 export default function BookmarkButton({ articleId, initialBookmarked = false }: Props) {
   const [bookmarked, setBookmarked] = useState(initialBookmarked);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setBookmarked(initialBookmarked);
+  }, [initialBookmarked]);
 
   async function toggle() {
     setLoading(true);
