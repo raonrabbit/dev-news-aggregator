@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "description": "Harness hooks for dev-news-aggregator MVP",
+  "hooks": {
+    "preflight": {
+      "command": "bash .claude/hooks/preflight.sh",
+      "when": [
+        "session_start",
+        "before_implementation"
+      ]
+    },
+    "post-change-check": {
+      "command": "bash .claude/hooks/post-change-check.sh",
+      "when": [
+        "after_file_change",
+        "before_task_complete"
+      ]
+    }
+  }
+}
