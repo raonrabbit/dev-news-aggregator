@@ -1,0 +1,94 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  branch-policy:
+    name: Branch Policy
+    if: ${{ github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate branch naming policy
+        run: bash .claude/ci/check-branch-policy.sh
+
+  harness-guard:
+    name: Harness Guard
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify harness files exist
+        run: |
+          test -f CLAUDE.md
+          test -f .claude/hooks.json
+          test -f .claude/hooks/preflight.sh
+          test -f .claude/hooks/post-change-check.sh
+          test -f .claude/ci/enforce-static-guards.sh
+          test -f .claude/ci/enforce-architecture.sh
+          test -f .claude/ci/check-doc-drift.sh
+          test -f .claude/ci/check-branch-policy.sh
+
+      - name: Validate shell syntax
+        run: |
+          bash -n .claude/hooks/preflight.sh
+          bash -n .claude/hooks/post-change-check.sh
+          bash -n .claude/ci/enforce-static-guards.sh
+          bash -n .claude/ci/enforce-architecture.sh
+          bash -n .claude/ci/check-doc-drift.sh
+          bash -n .claude/ci/check-branch-policy.sh
+
+      - name: Run strict static guards
+        run: bash .claude/ci/enforce-static-guards.sh
+
+      - name: Run architecture invariants
+        run: bash .claude/ci/enforce-architecture.sh
+
+      - name: Run docs drift checks
+        run: bash .claude/ci/check-doc-drift.sh
+
+  quality-check:
+    name: Typecheck And Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        if: ${{ hashFiles('package-lock.json') != '' || hashFiles('package.json') != '' }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        if: ${{ hashFiles('package-lock.json') != '' }}
+        run: npm ci
+
+      - name: Typecheck
+        if: ${{ hashFiles('package.json') != '' }}
+        run: |
+          if node -e "const p=require('./package.json'); process.exit(p.scripts && p.scripts.typecheck ? 0 : 1)"; then
+            npm run typecheck
+          else
+            echo "typecheck script not found; skipping"
+          fi
+
+      - name: Lint
+        if: ${{ hashFiles('package.json') != '' }}
+        run: |
+          if node -e "const p=require('./package.json'); process.exit(p.scripts && p.scripts.lint ? 0 : 1)"; then
+            npm run lint
+          else
+            echo "lint script not found; skipping"
+          fi

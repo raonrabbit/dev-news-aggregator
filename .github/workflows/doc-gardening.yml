@@ -1,0 +1,23 @@
+name: Doc Gardening
+
+on:
+  schedule:
+    - cron: "0 3 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  doc-drift:
+    name: Check Doc Drift
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate scripts
+        run: bash -n .claude/ci/check-doc-drift.sh
+
+      - name: Run doc drift check
+        run: bash .claude/ci/check-doc-drift.sh
