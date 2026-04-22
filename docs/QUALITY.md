@@ -16,3 +16,13 @@
 2. QA Lint Verifier 검증
 3. Performance Guardian 검증
 4. 실패 항목 재수정 후 재검증
+
+## PR Fix Loop
+- 리뷰 reject 또는 CI 실패 시 `docs/PR_LOOP.md` 절차를 따릅니다.
+- 수정 내역은 PR 코멘트에 요약하고 같은 브랜치로 재푸시합니다.
+
+## Commit Message Convention
+- 형식: `<type>: <한국어 요약>`
+- 예시: `feat: 기사 목록 페이지 및 API route 구현`
+- 제목은 한국어로 작성하고 종결 어미를 사용하지 않습니다.
+- 자동 트레일러(`Made-with: Cursor`)를 커밋 메시지에 포함하지 않습니다.
