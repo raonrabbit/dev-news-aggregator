@@ -11,6 +11,7 @@
 4. 실패 항목을 Dev Implementer에 재할당
 5. 통과 시 기능 브랜치에서 커밋/푸시
 6. PR 생성 후 리뷰 대기
+7. reject 또는 CI fail 시 PR 수정 루프 모드 실행
 
 ## 세션 운영 규칙
 - 작은 변경(파일 3개 이하, 로직 변경 1기능)은 단일 세션으로 처리합니다.
@@ -37,6 +38,8 @@
   4. `git push -u origin HEAD`
   5. `gh pr create --title ... --body ...`
 - PR 생성 후에는 자동 merge하지 않고 사용자 리뷰를 기다립니다.
+- 리뷰 reject 또는 CI fail이면 `docs/PR_LOOP.md` 순서로 자동 전환합니다.
+- 피드백 수집 시 `bash .claude/tools/pr-loop-helper.sh <pr-number>`를 사용합니다.
 
 ## 핸드오프 템플릿
 - Task:

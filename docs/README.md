@@ -12,6 +12,7 @@
 - `docs/SECURITY.md`
 - `docs/UI.md`
 - `docs/PLANS.md`
+- `docs/PR_LOOP.md`
 - `docs/progress/README.md`
 - `docs/progress/TEMPLATE.md`
 
