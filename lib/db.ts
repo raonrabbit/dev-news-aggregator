@@ -72,6 +72,17 @@ export async function upsertArticles(
   if (error) throw error;
 }
 
+export async function getBookmarkIdsForUser(userId: string): Promise<string[]> {
+  const db = serviceClient();
+  const { data, error } = await db
+    .from('bookmarks')
+    .select('article_id')
+    .eq('user_id', userId);
+
+  if (error) throw error;
+  return (data ?? []).map((row) => row.article_id);
+}
+
 export async function getBookmarksForUser(userId: string, page = 0): Promise<Article[]> {
   const db = serviceClient();
   const from = page * PAGE_SIZE;
