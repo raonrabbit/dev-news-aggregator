@@ -1,0 +1,32 @@
+name: RSS Fetch
+
+on:
+  schedule:
+    - cron: "0 * * * *"   # 매 시간 정각
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fetch-rss:
+    name: Fetch RSS Feeds
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Fetch and save articles
+        env:
+          SUPABASE_PROJECT_URL: ${{ secrets.SUPABASE_PROJECT_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: npx tsx scripts/fetch-rss.ts
